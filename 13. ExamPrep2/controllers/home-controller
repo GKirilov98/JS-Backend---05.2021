@@ -1,0 +1,24 @@
+const router = require('express').Router();
+const {isUser, isGuest} = require("../middlewares/guards");
+
+router.get('/', isGuest(),
+    (req, res) => {
+        res.render("home/guest-home")
+    }
+)
+
+router.get('/home', isUser(),
+  async  (req, res) => {
+        let plays = await req.storage.findAllPlay();
+       plays = plays.map(e => {
+           e.likes = e.usersLiked.length;
+           return e;
+       });
+        const ctx = {
+            plays
+        }
+        res.render("home/user-home", ctx)
+    }
+)
+
+module.exports = router;
